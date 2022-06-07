@@ -11,16 +11,16 @@ namespace BotPlazaVea2._0.Clases
     {
         string url = "https://www.plazavea.com.pe/";
 
-        //private static List<string> categorias = new List<string>
-        //{
-        //    "muebles","tecnologia","calzado","deportes","carnes-aves-y-pescados","packs","abarrotes","bebidas","limpieza"
-        //    ,"panaderia-y-pasteleria","frutas-y-verduras","moda","libreria-y-oficina"
-        //};
-
         private static List<string> categorias = new List<string>
         {
-            "packs"
+            "muebles","tecnologia","calzado","deportes","carnes-aves-y-pescados","packs","abarrotes","bebidas","limpieza"
+            ,"panaderia-y-pasteleria","frutas-y-verduras","moda","libreria-y-oficina"
         };
+
+        //private static List<string> categorias = new List<string>
+        //{
+        //    "packs"
+        //};
 
         List<string> Urls = new List<string>();
 
@@ -64,7 +64,7 @@ namespace BotPlazaVea2._0.Clases
 
                 await LoggingService.LogAsync($"{pagina} paginas encontradas", TipoCodigo.WARN);
 
-                var cantidad_total = 10;
+                var cantidad_total = 200;
 
                 for (int i = 1; i <= pagina; i++)
                 {
@@ -171,7 +171,7 @@ namespace BotPlazaVea2._0.Clases
                     "if(document.querySelectorAll('.bread-crumb')[0].children[0].children.length===4)" +
                     "   subti = document.querySelectorAll('.bread-crumb')[0].children[0].children[3].children[0].children[0].innerText;" +
                     "else" +
-                    "   subti = null;" +
+                    "   subti = 'Promociones';" +
                     "const nompro = document.querySelectorAll('.productName')[0].innerText;" +
                     "const precior = document.querySelectorAll('.ProductCard__content__price')[0].innerText.split(' ')[1];" +
                     "const precioo = document.querySelectorAll('.ProductCard__content__price')[1].innerText.split(' ')[1];" +
