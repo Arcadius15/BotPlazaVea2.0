@@ -11,6 +11,8 @@ namespace BotPlazaVea2._0.Models
     {
         public DbSet<Productos> Productos { get; set; }
         public DbSet<Urls> Urls { get; set; }
+        public DbSet<Caracteristicas> Caracteristicas { get; set; }
+        public DbSet<Descripciones> Descripciones { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +36,16 @@ namespace BotPlazaVea2._0.Models
             modelBuilder.Entity<Productos>()
                 .Property(p => p.id)
                 .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Caracteristicas>()
+                .HasOne(p => p.Productos)
+                .WithMany(c => c.caracteristicas)
+                .HasForeignKey(s => s.productoId);
+
+            modelBuilder.Entity<Descripciones>()
+                .HasOne(p => p.Productos)
+                .WithMany(d => d.descripciones)
+                .HasForeignKey(s => s.productoId);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

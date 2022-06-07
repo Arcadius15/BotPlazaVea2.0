@@ -179,6 +179,7 @@ namespace BotPlazaVea2._0.Clases
                     "const url = window.location.href;" +
                     "const cod = document.querySelectorAll('.productReference')[0].innerText;" +
                     @"const descripcion = document.querySelectorAll('.ProductDetails__specifications')[0].innerText.split('\n');" +
+                    @"const caracteristicas = document.querySelectorAll('.containerHighlight')[0].innerText.split('\n');" +
                     "let producto = {" +
                     "   'nombreProducto' : nompro," +
                     "   'precioReg' : precior," +
@@ -191,7 +192,8 @@ namespace BotPlazaVea2._0.Clases
                     "   'url' : url," +
                     "   'imagenUrl' : iurl," +
                     "   'codigo' : cod," +
-                    "   'descripcion' : descripcion" +
+                    "   'descripcion' : descripcion," +
+                    "   'caracteristicas' : caracteristicas" +
                     "};" +
                     "return producto;" +
                     "}");

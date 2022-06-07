@@ -33,9 +33,22 @@ namespace BotPlazaVea2._0.Utils
                         imagenUrl = item.imagenUrl,
                         proveedor = item.proveedor
                     };
+                    p.caracteristicas = new List<Caracteristicas>();
+                    p.descripciones = new List<Descripciones>();
+                    foreach (var car in item.caracteristicas)
+                    {
+                        Caracteristicas c = new Caracteristicas();
+                        c.caracteristica = car;
+                        p.caracteristicas.Add(c);
+                    }
+                    foreach (var desc in item.descripcion)
+                    {
+                        Descripciones d = new Descripciones();
+                        d.descripcion = desc;
+                        p.descripciones.Add(d);
+                    }
                     url.Producto = p;
                     listaurls.Add(url);
-
                 }
 
                 try
