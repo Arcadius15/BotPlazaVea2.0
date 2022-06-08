@@ -11,16 +11,16 @@ namespace BotPlazaVea2._0.Clases
     {
         string url = "https://www.plazavea.com.pe/";
 
-        private static List<string> categorias = new List<string>
-        {
-            "muebles","tecnologia","calzado","deportes","carnes-aves-y-pescados","packs","abarrotes","bebidas","limpieza"
-            ,"panaderia-y-pasteleria","frutas-y-verduras","moda","libreria-y-oficina"
-        };
-
         //private static List<string> categorias = new List<string>
         //{
-        //    "packs"
+        //    "muebles","tecnologia","calzado","deportes","carnes-aves-y-pescados","packs","abarrotes","bebidas","limpieza"
+        //    ,"panaderia-y-pasteleria","frutas-y-verduras","moda","libreria-y-oficina"
         //};
+
+        private static List<string> categorias = new List<string>
+        {
+            "packs"
+        };
 
         List<string> Urls = new List<string>();
 
@@ -64,7 +64,7 @@ namespace BotPlazaVea2._0.Clases
 
                 await LoggingService.LogAsync($"{pagina} paginas encontradas", TipoCodigo.WARN);
 
-                var cantidad_total = 200;
+                var cantidad_total = 15;
 
                 for (int i = 1; i <= pagina; i++)
                 {
@@ -178,13 +178,26 @@ namespace BotPlazaVea2._0.Clases
                     "const iurl = document.querySelectorAll('#image')[0].children[0].children[0].src;" +
                     "const url = window.location.href;" +
                     "const cod = document.querySelectorAll('.productReference')[0].innerText;" +
-                    @"const descripcion = document.querySelectorAll('.ProductDetails__specifications')[0].innerText.split('\n');" +
-                    @"const caracteristicas = document.querySelectorAll('.containerHighlight')[0].innerText.split('\n');" +
+                    "let desc = [];" +
+                    "if(typeof(document.querySelectorAll('.ProductDetails__specifications')[0].children[0].children[0])!='undefined')" +
+                    "   document.querySelectorAll('.ProductDetails__specifications')[0].children[0].children[0].children.forEach(x=>desc.push(x.innerText));" +
+                    "let car=[];" +
+                    "if(typeof(document.querySelectorAll('.containerHighlight')[0])!='undefined')" +
+                    @"  document.querySelectorAll('.containerHighlight')[0].children[0].children[1].children.forEach(x=>car.push(x.innerText));" +
+                    "let promo = false;" +
+                    "let cond = [];"+
+                    "if(typeof(document.querySelectorAll('.ProductCard__promotion')[0])!='undefined'){" +
+                    "   promo = true;" +
+                    "   if(typeof(document.querySelectorAll('.ProductCard__promotion')[0].children[1])!='undefined')" +
+                    "       document.querySelectorAll('.ProductCard__promotion')[0].children[1].children.forEach(x=>cond.push(x.innerText));" +
+                    "   else" +
+                    "       document.querySelectorAll('.ProductCard__promotion')[0].children[0].children[1].children.forEach(x=>cond.push(x.innerText));" +
+                    "};" +
                     "let producto = {" +
                     "   'nombreProducto' : nompro," +
                     "   'precioReg' : precior," +
                     "   'precioOferta' : precioo," +
-                    "   'proveedor' : 'Diego'," +
+                    "   'proveedor' : 'Diego Vicente'," +
                     "   'categoria' : categoria," +
                     "   'subcategoria' : subcat," +
                     "   'tipo' : tipo," +
@@ -192,22 +205,48 @@ namespace BotPlazaVea2._0.Clases
                     "   'url' : url," +
                     "   'imagenUrl' : iurl," +
                     "   'codigo' : cod," +
-                    "   'descripcion' : descripcion," +
-                    "   'caracteristicas' : caracteristicas" +
+                    "   'descripcion' : desc," +
+                    "   'caracteristicas' : car," +
+                    "   'condiciones': cond," +
+                    "   'promocion' : promo" +
                     "};" +
                     "return producto;" +
                     "}");
+
+                    StringBuilder stringBuilder = new StringBuilder();
+
+                    info.descripcion.ForEach(x=>stringBuilder.AppendLine(x));
+                    var desc = stringBuilder.ToString();
+
+                    stringBuilder.Clear();
+
+                    info.caracteristicas.ForEach(x=>stringBuilder.AppendLine(x));
+                    var car = stringBuilder.ToString();
+
+                    stringBuilder.Clear();
+
+                    var cond = "Sin promociones";
+
+                    if (info.promocion)
+                    {
+                        info.condiciones.ForEach(x=>stringBuilder.AppendLine(x));
+                        cond = stringBuilder.ToString();
+                    }
+
                     await LoggingService.LogAsync(" Producto Obtenido", TipoCodigo.HEAD);
                     await LoggingService.LogAsync("\n" + info.nombreProducto + "\n" +
-                        info.precioOferta + "\n" +
-                        info.precioReg + "\n" +
-                        info.imagenUrl + "\n" +
-                        info.categoria + "\n" +
-                        info.subcategoria + "\n" +
-                        info.tipo + "\n" +
-                        info.codigo + "\n" +
-                        info.descripcion[0] + "\n" +
-                        info.subtipo,
+                        "Precio Oferta : "+info.precioOferta + "\n" +
+                        "Precio Regular : " + info.precioReg + "\n" +
+                        "Imagen URL : " + info.imagenUrl + "\n" +
+                        "Categoria : " + info.categoria + "\n" +
+                        "Sub Categoria : " + info.subcategoria + "\n" +
+                        "Tipo : " + info.tipo + "\n" +
+                        "Sub tipo : " + info.subtipo + "\n" +
+                        "Codigo : " + info.codigo + "\n" +
+                        "Descripciones : " + desc + "\n" +
+                        "Caracteristicas : " + car + "\n" +
+                        "Promocion : " + info.promocion + "\n" + 
+                        "Condiciones : " + cond,
                         TipoCodigo.DATA);
                     listado.Add(info);
 

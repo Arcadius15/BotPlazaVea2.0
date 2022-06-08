@@ -31,10 +31,12 @@ namespace BotPlazaVea2._0.Utils
                         tipo = item.tipo,
                         subtipo = item.subtipo,
                         imagenUrl = item.imagenUrl,
-                        proveedor = item.proveedor
+                        proveedor = item.proveedor,
+                        promocion = item.promocion
                     };
                     p.caracteristicas = new List<Caracteristicas>();
                     p.descripciones = new List<Descripciones>();
+                    p.promociones = new List<Promociones>();
                     foreach (var car in item.caracteristicas)
                     {
                         Caracteristicas c = new Caracteristicas();
@@ -47,15 +49,31 @@ namespace BotPlazaVea2._0.Utils
                         d.descripcion = desc;
                         p.descripciones.Add(d);
                     }
+                    foreach (var prom in item.condiciones)
+                    {
+                        Promociones pr = new Promociones();
+                        pr.condicion = prom;
+                        p.promociones.Add(pr);
+                    }
                     url.Producto = p;
-                    listaurls.Add(url);
+                    if (!context.Urls.Any(x=>x.url == url.url))
+                    {
+                        listaurls.Add(url);
+                    }
+                    
                 }
 
                 try
                 {
+                    if (listaurls.Count==0)
+                    {
+                        throw new ArgumentNullException("No existen nuevas urls.");
+                    }
                     //bulk es para operaciones grandes, pero funciona correctamente para mapear con otros objetos
-                    await context.Urls.AddRangeAsync(listaurls);
+                    await context.AddRangeAsync(listaurls);
                     await context.BulkSaveChangesAsync();
+                    //await context.BulkSaveChangesAsync(new BulkConfig { OmitClauseExistsExcept = true});
+                    //bulk extensions es de paga
                     /*await context.BulkMergeAsync(listaurls, options =>
                     {
                         options.InsertIfNotExists = true;
@@ -94,7 +112,7 @@ namespace BotPlazaVea2._0.Utils
                 }
                 catch (Exception ex)
                 {
-                    await LoggingService.LogAsync($"{ex}", TipoCodigo.ERROR);
+                    await LoggingService.LogAsync($"{ex.Message}", TipoCodigo.ERROR);
                 }
 
             }

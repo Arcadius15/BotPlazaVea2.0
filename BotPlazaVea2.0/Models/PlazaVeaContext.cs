@@ -37,14 +37,32 @@ namespace BotPlazaVea2._0.Models
                 .Property(p => p.id)
                 .ValueGeneratedOnAdd();
 
+
+            modelBuilder.Entity<Caracteristicas>()
+                .Property(x => x.id)
+                .ValueGeneratedOnAdd();
+
             modelBuilder.Entity<Caracteristicas>()
                 .HasOne(p => p.Productos)
                 .WithMany(c => c.caracteristicas)
                 .HasForeignKey(s => s.productoId);
 
             modelBuilder.Entity<Descripciones>()
+                .Property(x => x.id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Descripciones>()
                 .HasOne(p => p.Productos)
                 .WithMany(d => d.descripciones)
+                .HasForeignKey(s => s.productoId);
+
+            modelBuilder.Entity<Promociones>()
+                .Property(x => x.id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Promociones>()
+                .HasOne(p => p.productos)
+                .WithMany(p => p.promociones)
                 .HasForeignKey(s => s.productoId);
         }
 

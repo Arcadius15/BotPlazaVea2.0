@@ -20,6 +20,8 @@ namespace BotPlazaVea2._0.Clases
         public string imagenUrl { get; set; }
         public List<string> descripcion { get; set; }
         public List<string> caracteristicas { get; set; }
+        public List<string> condiciones { get; set; }
+        public bool promocion { get; set; }
         public string codigo { get; set; }
     }
 }

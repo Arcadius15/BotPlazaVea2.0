@@ -22,9 +22,11 @@ namespace BotPlazaVea2._0.Models
         public string tipo { get; set; }
         public string subtipo { get; set; }
         public string imagenUrl { get; set; }
+        public bool promocion { get; set; }  
         
         public virtual ICollection<Caracteristicas> caracteristicas { get; set; }
         public virtual ICollection<Descripciones> descripciones { get; set; }
+        public virtual ICollection<Promociones> promociones { get; set; }
 
         public int? idUrl { get; set; }
         public virtual Urls Url { get; set; }
