@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BotPlazaVea2._0.Migrations
 {
     [DbContext(typeof(PlazaVeaContext))]
-    [Migration("20220607235642_v1")]
+    [Migration("20220608233054_v1")]
     partial class v1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -153,6 +153,17 @@ namespace BotPlazaVea2._0.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<string>("endpoint")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("pagina")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("url")
                         .IsRequired()

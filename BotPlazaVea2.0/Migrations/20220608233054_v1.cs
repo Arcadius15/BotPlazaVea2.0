@@ -15,7 +15,10 @@ namespace BotPlazaVea2._0.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    url = table.Column<string>(type: "text", nullable: false)
+                    url = table.Column<string>(type: "text", nullable: false),
+                    pagina = table.Column<int>(type: "integer", nullable: false),
+                    endpoint = table.Column<string>(type: "text", nullable: false),
+                    status = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

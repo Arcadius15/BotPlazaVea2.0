@@ -18,6 +18,7 @@ namespace BotPlazaVea2._0.Models
         {
             modelBuilder.UseIdentityColumns();
 
+
             modelBuilder.Entity<Urls>()
                 .HasOne(a => a.Producto)
                 .WithOne(b => b.Url)
@@ -64,11 +65,15 @@ namespace BotPlazaVea2._0.Models
                 .HasOne(p => p.productos)
                 .WithMany(p => p.promociones)
                 .HasForeignKey(s => s.productoId);
+
+            modelBuilder.Entity<Urls>()
+                .Property(x => x.status)
+                .HasConversion<string>();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
-            => optionsBuilder.UseNpgsql(@"Host=localhost;Database=PlazaVeaData;Username=postgres;Password=admin");
+            => optionsBuilder.UseNpgsql(@"Host=localhost;Port=5433;Database=PlazaVeaData;Username=postgres;Password=admin");
 
     }
 

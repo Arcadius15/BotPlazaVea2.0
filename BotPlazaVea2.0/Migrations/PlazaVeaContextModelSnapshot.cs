@@ -152,6 +152,17 @@ namespace BotPlazaVea2._0.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
+                    b.Property<string>("endpoint")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("pagina")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("url")
                         .IsRequired()
                         .HasColumnType("text");

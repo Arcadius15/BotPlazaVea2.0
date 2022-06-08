@@ -1,4 +1,6 @@
-﻿using BotPlazaVea2._0.Utils;
+﻿using BotPlazaVea2._0.Models;
+using BotPlazaVea2._0.Utils;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +24,10 @@ namespace BotPlazaVea2._0.Clases
         //    "packs"
         //};
 
-        List<string> Urls = new List<string>();
+        //private static List<string> categorias = new List<string>
+        //{
+        //    "muebles","tecnologia","calzado"
+        //};
 
 
         public async Task obtenerUrls()
@@ -35,7 +40,11 @@ namespace BotPlazaVea2._0.Clases
 
             await LoggingService.LogAsync("Log", TipoCodigo.LOG);
 
+            
+
             await using var page = await browser.NewPageAsync();
+
+            List<Urls> listaUrls = new List<Urls>();
 
             int pagina = 0;
             int cantidad_productos = 0;
@@ -111,7 +120,8 @@ namespace BotPlazaVea2._0.Clases
                             {
                                 await LoggingService.LogAsync($"Url {item.Path} de pagina {i} Obtenido", TipoCodigo.HEAD);
                                 await LoggingService.LogAsync(item.ToString(), TipoCodigo.DATA);
-                                Urls.Add(item.ToString());
+                                Urls urlnew = new Urls() {url = item.ToString(),pagina = i,status = Status.PENDIENTE ,endpoint = cat};
+                                listaUrls.Add(urlnew);
                                 cantidad_productos++;
                             }
                             else
@@ -130,17 +140,16 @@ namespace BotPlazaVea2._0.Clases
                 cantidad_productos = 0;
             }
             await browser.CloseAsync();
-            await LoggingService.LogAsync($"Proceso terminado. Se encontraron {Urls.Count} productos.", TipoCodigo.INFO);
+            await LoggingService.LogAsync($"Proceso terminado. Se encontraron {listaUrls.Count} productos.", TipoCodigo.INFO);
             await LoggingService.LogAsync("Iniciando extraccion de data.", TipoCodigo.WARN);
-
-            List<Producto> lista = await obtenerProductos(Urls);
-            ImportToDb import = new ImportToDb();
-            await import.guardarProducto(lista);
+            ImportToDb import = new ImportToDb(listaUrls);
+            await import.guardarUrls();
+            await buscarUrls();
             await LoggingService.LogAsync($"Proceso terminado.", TipoCodigo.INFO);
         }
 
 
-        public async Task<List<Producto>> obtenerProductos(List<string> urls)
+        public async Task obtenerProductos(List<string> urls)
         {
             await LoggingService.LogAsync("Cargando Browser...", TipoCodigo.INFO);
 
@@ -150,8 +159,8 @@ namespace BotPlazaVea2._0.Clases
 
             await using var page = await browser.NewPageAsync();
 
+            List<Producto> products = new List<Producto>();
 
-            List<Producto> listado = new();
             foreach (var uri in urls)
             {
                 try
@@ -248,7 +257,7 @@ namespace BotPlazaVea2._0.Clases
                         "Promocion : " + info.promocion + "\n" + 
                         "Condiciones : " + cond,
                         TipoCodigo.DATA);
-                    listado.Add(info);
+                    products.Add(info);
 
 
                 }
@@ -258,8 +267,29 @@ namespace BotPlazaVea2._0.Clases
                     await LoggingService.LogAsync($" {ex.Message}", TipoCodigo.ERROR_INFO);
                 }
             }
-            return listado;
 
+            ImportToDb import = new ImportToDb(products);
+            await import.guardarProducto();
+            await LoggingService.LogAsync($"Productos Guardados.", TipoCodigo.INFO);
+        }
+
+        public async Task buscarUrls()
+        {
+            foreach (var item in categorias)
+            {
+                List<string> buscarUrls = new List<string>();
+                using (var context = new PlazaVeaContext())
+                {
+                   var qry =  await context.Urls.Where(x => x.status == Status.PENDIENTE && x.endpoint.Equals(item))
+                        .Select(x => x.url)
+                        .ToListAsync();
+                   buscarUrls = qry;
+                }
+                await LoggingService.LogAsync($"Obteniendo productos de Categoria {item}.", TipoCodigo.WARN);
+                await obtenerProductos(buscarUrls);
+                await LoggingService.LogAsync($"Data productos de Categoria {item} obtenida.", TipoCodigo.WARN);
+            }
+            
         }
 
     }

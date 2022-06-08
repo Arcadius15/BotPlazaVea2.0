@@ -6,21 +6,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BotPlazaVea2._0.Utils
 {
     public class ImportToDb
     {
-        public async Task guardarProducto(List<Producto> productos)
+        private List<Producto> productos = new List<Producto>();
+        private List<Urls> listaUrls =  new List<Urls>();
+
+        public ImportToDb(List<Producto> pro)
+        {
+            this.productos = pro;
+        }
+        public ImportToDb(List<Urls> urls)
+        {
+            this.listaUrls = urls;
+        }
+
+
+
+        public async Task guardarProducto()
         {
             using (var context = new PlazaVeaContext())
             {
-                List<Urls> listaurls = new List<Urls>();
                 List<Productos> listaprod = new List<Productos>();
                 foreach (var item in productos)
                 {
-                    Urls url = new Urls();
-                    url.url = item.url;
+                    Urls? url = await context.Urls.Where(x => x.url.Equals(item.url)).FirstOrDefaultAsync();
+                    if (url != null)
+                    {
+                        if (url.status.Equals(Status.ERROR))
+                        {
+                            url.status = Status.ERROR;
+                            context.Urls.Update(url);
+                            await context.SaveChangesAsync();
+                            return;
+                        }else if (url.status.Equals(Status.ENCONTRADO))
+                        {
+                            return;
+                        }
+                        url.status = Status.ENCONTRADO;
+                        context.Urls.Update(url);
+                        await context.SaveChangesAsync();
+                    }
+                    else{return;}
+
                     Productos p = new Productos()
                     {
                         nombreProducto = item.nombreProducto,
@@ -32,8 +63,11 @@ namespace BotPlazaVea2._0.Utils
                         subtipo = item.subtipo,
                         imagenUrl = item.imagenUrl,
                         proveedor = item.proveedor,
-                        promocion = item.promocion
+                        promocion = item.promocion,
+                        idUrl = url.id
+                        
                     };
+                    
                     p.caracteristicas = new List<Caracteristicas>();
                     p.descripciones = new List<Descripciones>();
                     p.promociones = new List<Promociones>();
@@ -55,60 +89,19 @@ namespace BotPlazaVea2._0.Utils
                         pr.condicion = prom;
                         p.promociones.Add(pr);
                     }
-                    url.Producto = p;
-                    if (!context.Urls.Any(x=>x.url == url.url))
-                    {
-                        listaurls.Add(url);
-                    }
+                    listaprod.Add(p);
                     
                 }
 
                 try
                 {
-                    if (listaurls.Count==0)
+                    if (listaprod.Count==0)
                     {
-                        throw new ArgumentNullException("No existen nuevas urls.");
+                        throw new ArgumentNullException("No existen nuevos productos.");
                     }
                     //bulk es para operaciones grandes, pero funciona correctamente para mapear con otros objetos
-                    await context.AddRangeAsync(listaurls);
+                    await context.AddRangeAsync(listaprod);
                     await context.BulkSaveChangesAsync();
-                    //await context.BulkSaveChangesAsync(new BulkConfig { OmitClauseExistsExcept = true});
-                    //bulk extensions es de paga
-                    /*await context.BulkMergeAsync(listaurls, options =>
-                    {
-                        options.InsertIfNotExists = true;
-                        options.ErrorMode = Z.BulkOperations.ErrorModeType.RetrySingleAndContinue;
-                        options.IncludeGraph = true;
-                        options.IncludeGraphOperationBuilder = operation =>
-                        {
-                            switch (operation)
-                            {
-                                case BulkOperation<Urls> url:
-                                    url.InsertIfNotExists = true;
-                                    url.ColumnPrimaryKeyExpression = x => new { x.url };
-                                    url.AutoMapOutputDirection = true;
-                                    break;
-                                case BulkOperation<Productos> p:
-                                    p.InsertIfNotExists = true;
-                                    p.ColumnPrimaryKeyExpression = x =>
-                                        new {
-                                            x.imagenUrl,
-                                            x.nombreProducto,
-                                            x.proveedor,
-                                            x.subcategoria,
-                                            x.categoria,
-                                            x.tipo,
-                                            x.subtipo,
-                                            x.precioOferta,
-                                            x.precioReg
-                                        };
-                                    p.AutoMapOutputDirection = true;
-                                    break;
-
-                            }
-                        };
-                    });
-                    */
                 }
                 catch (Exception ex)
                 {
@@ -117,5 +110,35 @@ namespace BotPlazaVea2._0.Utils
 
             }
         }
+    
+        public async Task guardarUrls()
+        {
+            using (var context = new PlazaVeaContext())
+            {
+                List<Urls> lista = new List<Urls>();
+                foreach (Urls url in listaUrls)
+                {
+                    if (!context.Urls.Any(x => x.url == url.url))
+                    {
+                        lista.Add(url);
+                    }
+                }
+                try
+                {
+                    if (lista.Count==0)
+                    {
+                       throw new ArgumentNullException("No existen nuevos Urls.");
+                    }
+                    await context.BulkInsertAsync(lista);
+                }
+                catch (Exception ex)
+                {
+
+                    await LoggingService.LogAsync($"{ex.Message}", TipoCodigo.ERROR);
+                }
+                
+            }
+        }
+    
     }
 }
