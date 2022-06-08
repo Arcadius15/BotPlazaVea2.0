@@ -11,16 +11,16 @@ namespace BotPlazaVea2._0.Clases
     {
         string url = "https://www.plazavea.com.pe/";
 
-        //private static List<string> categorias = new List<string>
-        //{
-        //    "muebles","tecnologia","calzado","deportes","carnes-aves-y-pescados","packs","abarrotes","bebidas","limpieza"
-        //    ,"panaderia-y-pasteleria","frutas-y-verduras","moda","libreria-y-oficina"
-        //};
-
         private static List<string> categorias = new List<string>
         {
-            "packs"
+            "muebles","tecnologia","calzado","deportes","carnes-aves-y-pescados","packs","abarrotes","bebidas","limpieza"
+            ,"panaderia-y-pasteleria","frutas-y-verduras","moda","libreria-y-oficina"
         };
+
+        //private static List<string> categorias = new List<string>
+        //{
+        //    "packs"
+        //};
 
         List<string> Urls = new List<string>();
 
@@ -64,7 +64,7 @@ namespace BotPlazaVea2._0.Clases
 
                 await LoggingService.LogAsync($"{pagina} paginas encontradas", TipoCodigo.WARN);
 
-                var cantidad_total = 15;
+                var cantidad_total = 250;
 
                 for (int i = 1; i <= pagina; i++)
                 {
