@@ -73,7 +73,7 @@ namespace BotPlazaVea2._0.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
-            => optionsBuilder.UseNpgsql(@"Host=localhost;Port=5433;Database=PlazaVeaData;Username=postgres;Password=admin");
+            => optionsBuilder.UseNpgsql(@"Host=localhost;Port=5433;Include Error Detail=true;Database=PlazaVeaData;Username=postgres;Password=admin");
 
     }
 

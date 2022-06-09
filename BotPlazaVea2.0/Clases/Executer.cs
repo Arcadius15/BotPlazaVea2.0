@@ -73,7 +73,7 @@ namespace BotPlazaVea2._0.Clases
 
                 await LoggingService.LogAsync($"{pagina} paginas encontradas", TipoCodigo.WARN);
 
-                var cantidad_total = 250;
+                var cantidad_total = 50;
 
                 for (int i = 1; i <= pagina; i++)
                 {
@@ -118,11 +118,15 @@ namespace BotPlazaVea2._0.Clases
                             }
                             if (!String.IsNullOrEmpty(item.ToString().Trim()))
                             {
-                                await LoggingService.LogAsync($"Url {item.Path} de pagina {i} Obtenido", TipoCodigo.HEAD);
-                                await LoggingService.LogAsync(item.ToString(), TipoCodigo.DATA);
-                                Urls urlnew = new Urls() {url = item.ToString(),pagina = i,status = Status.PENDIENTE ,endpoint = cat};
-                                listaUrls.Add(urlnew);
-                                cantidad_productos++;
+                                if (!listaUrls.Any(x=>x.url==item.ToString()))
+                                {
+                                    await LoggingService.LogAsync($"Url {item.Path} de pagina {i} Obtenido", TipoCodigo.HEAD);
+                                    await LoggingService.LogAsync(item.ToString(), TipoCodigo.DATA);
+                                    Urls urlnew = new Urls() { url = item.ToString(), pagina = i, status = Status.PENDIENTE, endpoint = cat };
+                                    listaUrls.Add(urlnew);
+                                    cantidad_productos++;
+                                }
+                                
                             }
                             else
                             {

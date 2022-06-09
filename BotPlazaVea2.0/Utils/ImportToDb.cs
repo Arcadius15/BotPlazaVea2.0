@@ -46,9 +46,6 @@ namespace BotPlazaVea2._0.Utils
                         {
                             return;
                         }
-                        url.status = Status.ENCONTRADO;
-                        context.Urls.Update(url);
-                        await context.SaveChangesAsync();
                     }
                     else{return;}
 
@@ -90,7 +87,9 @@ namespace BotPlazaVea2._0.Utils
                         p.promociones.Add(pr);
                     }
                     listaprod.Add(p);
-                    
+                    url.status = Status.ENCONTRADO;
+                    listaUrls.Add(url);
+
                 }
 
                 try
@@ -100,6 +99,7 @@ namespace BotPlazaVea2._0.Utils
                         throw new ArgumentNullException("No existen nuevos productos.");
                     }
                     //bulk es para operaciones grandes, pero funciona correctamente para mapear con otros objetos
+                    await context.BulkUpdateAsync(listaUrls);
                     await context.AddRangeAsync(listaprod);
                     await context.BulkSaveChangesAsync();
                 }
